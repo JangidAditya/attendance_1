@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Attendance Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label,
+        input[type="text"],
+        input[type="submit"],
+        select {
+            display: block;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        select,
+        input[type="submit"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Attendance Form</h1>
+        <form method="POST" action="http://127.0.0.1:5000/register">
+            <label for="mobilenumber">Mobile Number:</label>
+            <input type="text" id="mobilenumber" name="mobilenumber" required>
+
+            <label for="username">Name:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="punchinout">punchinout:</label>
+            <select id="punchinout" name="punchinout" required>
+                <option value="punch-in">Punch-In</option>
+                <option value="punch-out">Punch-Out</option>
+            </select>
+
+            <label for="datetime">Date & Time:</label>
+            <input type="text" id="datetime" name="datetime" required readonly>
+            <script>
+                function updateDateTime() {
+                    var now = new Date();
+                    document.getElementById('datetime').value = now.toLocaleString();
+                }
+                setInterval(updateDateTime, 1000);
+                updateDateTime();
+            </script>
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" required>
+            <script>
+                function getLocation() {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(showPosition);
+                    } else {
+                        alert("Geolocation is not supported by this browser.");
+                    }
+                }
+
+                function showPosition(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    document.getElementById('location').value = latitude + ', ' + longitude;
+                }
+
+                // Call getLocation when the page loads (optional)
+                getLocation();
+            </script>
+
+            <button type="button" onclick="selfie()">Capture Selfie</button>
+            <input type="hidden" id="selfie" name="selfie" required>
+
+            <script>
+                function selfie() {
+                    if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
+                        navigator.mediaDevices.getUserMedia({ video: true })
+                            .then(function (stream) {
+                                var video = document.createElement('video');
+                                video.srcObject = stream;
+                                video.play();
+
+                                var canvas = document.createElement('canvas');
+                                canvas.width = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                var context = canvas.getContext('2d');
+
+                                setInterval(function () {
+                                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                }, 1000 / 30);
+
+                                var selfieContainer = document.getElementById('selfie-container');
+                                selfieContainer.innerHTML = '';
+                                selfieContainer.appendChild(canvas);
+
+                                document.getElementById('selfie-data').value = canvas.toDataURL('image/jpeg');
+                            })
+                            .catch(function (error) {
+                                console.error('Error accessing the camera: ', error);
+                            });
+                    } else {
+                        alert('Sorry, your browser does not support accessing the camera.');
+                    }
+                }
+            </script>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <script>
+        // JavaScript code remains the same
+    </script>
+</body>
+
+</html>
